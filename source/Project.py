@@ -1,15 +1,20 @@
 
 from source.camera import camera
-# import source.camera
+from source.LaneDetect import LaneDetect
+from source.gradients import get_edges
 
-# from .Camera import CameraCalibration
-
+from moviepy.editor import VideoFileClip
 import glob
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.image as mpimg
 import cv2
 
+#
+# def process_video(input_video_file):
+#     clip1 = VideoFileClip(input_video_file);
+#     outputclip = clip1.fl_image(process_vid)
+#     outputclip.write_videofile('output_'+input_video_file, audio=False);
 
 
 if __name__ == "__main__":
@@ -19,8 +24,8 @@ if __name__ == "__main__":
     # print(images)
 
     camera_calibrate = camera()
-    # camera_calibrate.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data.p')
-    #
+    # camera_calibrate.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data_1.p')
+
     # # images = sorted(images, key=lambda x: float(re.findall("(\d+)", x)[0]))
     #
     # print('Correction images (successfully detected corners):')
@@ -72,3 +77,44 @@ if __name__ == "__main__":
     #     i += 1
 
 
+
+    # image = mpimg.imread('../test_images/test6.jpg')
+    # result = get_edges(image, separate_channels=True)
+    #
+    # # Plot the result
+    # f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+    # # f.tight_layout()
+    # ax1.axis('off')
+    # ax1.imshow(image)
+    # ax1.set_title('Original', fontsize=18)
+    # ax2.axis('off')
+    # ax2.imshow(result)
+    # plt.show()
+
+    # for image_name in glob.glob('../test_images/*.jpg'):
+    #     orig_img = mpimg.imread(image_name)
+    #     undistort = camera_calibrate.undistort(orig_img)
+    #
+    #     lane_detecter = LaneDetect(undistort)
+    #     output_img = lane_detecter.process_pipeline(undistort)
+    #     f, (ax1) = plt.subplots(1, 1, figsize=(9, 6))
+    #     ax1.imshow(output_img)
+    #     ax1.set_title('output_img', fontsize=20)
+    #     plt.axis('off')
+    #     plt.show()
+
+
+    clip1 = VideoFileClip('../project_video.mp4')
+    lane_detecter = LaneDetect(clip1.get_frame(0))
+    outputclip = clip1.fl_image(lane_detecter.process_pipeline)
+    outputclip.write_videofile('../output_project_video.mp4', audio=False);
+
+    clip1 = VideoFileClip('../harder_challenge_video.mp4');
+    lane_detecter = LaneDetect(clip1.get_frame(0))
+    outputclip = clip1.fl_image(lane_detecter.process_pipeline)
+    outputclip.write_videofile('../output_harder_challenge_video.mp4', audio=False);
+
+    clip1 = VideoFileClip('../challenge_video.mp4')
+    lane_detecter = LaneDetect(clip1.get_frame(0))
+    outputclip = clip1.fl_image(lane_detecter.process_pipeline)
+    outputclip.write_videofile('../output_challenge_video.mp4', audio=False);

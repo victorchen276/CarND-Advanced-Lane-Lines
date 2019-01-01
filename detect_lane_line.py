@@ -285,7 +285,7 @@ def fit_polynomial(binary_warped):
     # left_xs = left_fit[0] * (ploty ** 2) + left_fit[1] * ploty + left_fit[2]
     # right_xs = right_fit[0] * (ploty ** 2) + right_fit[1] * ploty + right_fit[2]
     # xls, xrs, ys = left_xs.astype(np.uint32), right_xs.astype(np.uint32), ploty.astype(np.uint32)
-    #
+
     # # int(t / 2)
     # for xl, xr, y in zip(xls, xrs, ys):
     #     cv2.line(out_img, (xl, y), (xl, y), (255, 203, 57), 4)
