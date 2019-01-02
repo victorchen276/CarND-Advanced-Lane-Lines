@@ -13,7 +13,7 @@ from collections import deque
 
 import re
 
-
+# test
 def draw_images(images, cmap=None, savefile=False):
     cols = 2
     rows = (len(images) + 1) // cols
@@ -705,11 +705,3 @@ if __name__ == "__main__":
     # plt.show()
 
     # plt.savefig('undistort2.png')
-
-
-
-
-
-
-
-
