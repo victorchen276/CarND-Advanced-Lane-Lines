@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 from source.camera import camera
-from source.gradients import get_edges
+# from source.gradients import get_edges
 from source.LaneLine import LaneLine
 from source.window import Window
 
@@ -32,7 +32,7 @@ class LaneDetect(object):
         # birdeye_img, unwarp_matrix = self.camera_calibrate.birds_eye(img)
         # warped_edges_img = get_edges(birdeye_img)
 
-        edges = get_edges(img)
+        edges = self.get_edges(img)
         flat_edges, unwarp_matrix = self.camera_calibrate.birds_eye(edges)
 
         (l_x, l_y) = self.scan_frame_with_windows(flat_edges, self.l_windows)
@@ -67,7 +67,7 @@ class LaneDetect(object):
 
         # undist = self.camera_calibrate.undistort(frame)
 
-        edges = get_edges(frame)
+        edges = self.get_edges(frame)
         flat_edges, unwarp_matrix = self.camera_calibrate.birds_eye(edges)
         # birdeye_img, unwarp_matrix = self.camera_calibrate.birds_eye(frame)
         # flat_edges = get_edges(birdeye_img)
@@ -170,122 +170,136 @@ class LaneDetect(object):
         # Combine the result with the original image
         return cv2.addWeighted(image, 1, overlay, 0.3, 0)
 
-    def find_lane_pixels(self, binary_warped):
-        # Take a histogram of the bottom half of the image
-        histogram = np.sum(binary_warped[binary_warped.shape[0] // 2:, :], axis=0)
-        # Create an output image to draw on and visualize the result
-        out_img = np.dstack((binary_warped, binary_warped, binary_warped))
-        # Find the peak of the left and right halves of the histogram
-        # These will be the starting point for the left and right lines
-        midpoint = np.int(histogram.shape[0] // 2)
-        leftx_base = np.argmax(histogram[:midpoint])
-        rightx_base = np.argmax(histogram[midpoint:]) + midpoint
+    def gradient_abs_value_mask(self, image, sobel_kernel=3, axis='x', threshold=(0, 255)):
+        """
+        Masks the image based on gradient absolute value.
 
-        # HYPERPARAMETERS
-        # Choose the number of sliding windows
-        nwindows = 9
-        # Set the width of the windows +/- margin
-        margin = 100
-        # Set minimum number of pixels found to recenter window
-        minpix = 50
+        Parameters
+        ----------
+        image           : Image to mask.
+        sobel_kernel    : Kernel of the Sobel gradient operation.
+        axis            : Axis of the gradient, 'x' or 'y'.
+        threshold       : Value threshold for it to make it to appear in the mask.
 
-        # Set height of windows - based on nwindows above and image shape
-        window_height = np.int(binary_warped.shape[0] // nwindows)
-        # Identify the x and y positions of all nonzero pixels in the image
-        nonzero = binary_warped.nonzero()
-        nonzeroy = np.array(nonzero[0])
-        nonzerox = np.array(nonzero[1])
-        # Current positions to be updated later for each window in nwindows
-        leftx_current = leftx_base
-        rightx_current = rightx_base
+        Returns
+        -------
+        Image mask with 1s in activations and 0 in other pixels.
+        """
+        # Take the absolute value of derivative in x or y given orient = 'x' or 'y'
+        if axis == 'x':
+            sobel = np.absolute(cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=sobel_kernel))
+        if axis == 'y':
+            sobel = np.absolute(cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=sobel_kernel))
+        # Scale to 8-bit (0 - 255) then convert to type = np.uint8
+        sobel = np.uint8(255 * sobel / np.max(sobel))
+        # Create a mask of 1's where the scaled gradient magnitude is > thresh_min and < thresh_max
+        mask = np.zeros_like(sobel)
+        # Return this mask as your binary_output image
+        mask[(sobel >= threshold[0]) & (sobel <= threshold[1])] = 1
+        return mask
 
-        # Create empty lists to receive left and right lane pixel indices
-        left_lane_inds = []
-        right_lane_inds = []
+    def gradient_magnitude_mask(self, image, sobel_kernel=3, threshold=(0, 255)):
+        """
+        Masks the image based on gradient magnitude.
 
-        # Step through the windows one by one
-        for window in range(nwindows):
-            # Identify window boundaries in x and y (and right and left)
-            win_y_low = binary_warped.shape[0] - (window + 1) * window_height
-            win_y_high = binary_warped.shape[0] - window * window_height
-            win_xleft_low = leftx_current - margin
-            win_xleft_high = leftx_current + margin
-            win_xright_low = rightx_current - margin
-            win_xright_high = rightx_current + margin
+        Parameters
+        ----------
+        image           : Image to mask.
+        sobel_kernel    : Kernel of the Sobel gradient operation.
+        threshold       : Magnitude threshold for it to make it to appear in the mask.
 
-            # Draw the windows on the visualization image
-            cv2.rectangle(out_img, (win_xleft_low, win_y_low),
-                          (win_xleft_high, win_y_high), (0, 255, 0), 2)
-            cv2.rectangle(out_img, (win_xright_low, win_y_low),
-                          (win_xright_high, win_y_high), (0, 255, 0), 2)
+        Returns
+        -------
+        Image mask with 1s in activations and 0 in other pixels.
+        """
+        # Take the gradient in x and y separately
+        sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
+        sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
+        # Calculate the magnitude
+        magnitude = np.sqrt(sobel_x ** 2 + sobel_y ** 2)
+        # Scale to 8-bit (0 - 255) and convert to type = np.uint8
+        magnitude = (magnitude * 255 / np.max(magnitude)).astype(np.uint8)
+        # Create a binary mask where mag thresholds are met
+        mask = np.zeros_like(magnitude)
+        mask[(magnitude >= threshold[0]) & (magnitude <= threshold[1])] = 1
+        # Return this mask as your binary_output image
+        return mask
 
-            # Identify the nonzero pixels in x and y within the window #
-            good_left_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
-                              (nonzerox >= win_xleft_low) & (nonzerox < win_xleft_high)).nonzero()[0]
-            good_right_inds = ((nonzeroy >= win_y_low) & (nonzeroy < win_y_high) &
-                               (nonzerox >= win_xright_low) & (nonzerox < win_xright_high)).nonzero()[0]
+    def gradient_direction_mask(self, image, sobel_kernel=3, threshold=(0, np.pi / 2)):
+        """
+        Masks the image based on gradient direction.
 
-            # Append these indices to the lists
-            left_lane_inds.append(good_left_inds)
-            right_lane_inds.append(good_right_inds)
+        Parameters
+        ----------
+        image           : Image to mask.
+        sobel_kernel    : Kernel of the Sobel gradient operation.
+        threshold       : Direction threshold for it to make it to appear in the mask.
 
-            # If you found > minpix pixels, recenter next window on their mean position
-            if len(good_left_inds) > minpix:
-                leftx_current = np.int(np.mean(nonzerox[good_left_inds]))
-            if len(good_right_inds) > minpix:
-                rightx_current = np.int(np.mean(nonzerox[good_right_inds]))
+        Returns
+        -------
+        Image mask with 1s in activations and 0 in other pixels.
+        """
+        # Take the gradient in x and y separately
+        sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
+        sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
+        # Take the absolute value of the x and y gradients and calculate the direction of the gradient
+        direction = np.arctan2(np.absolute(sobel_y), np.absolute(sobel_x))
+        # Create a binary mask where direction thresholds are met
+        mask = np.zeros_like(direction)
+        # Return this mask as your binary_output image
+        mask[(direction >= threshold[0]) & (direction <= threshold[1])] = 1
+        return mask
 
-        # Concatenate the arrays of indices (previously was a list of lists of pixels)
-        try:
-            left_lane_inds = np.concatenate(left_lane_inds)
-            right_lane_inds = np.concatenate(right_lane_inds)
-        except ValueError:
-            # Avoids an error if the above is not implemented fully
-            pass
+    def color_threshold_mask(self, image, threshold=(0, 255)):
+        """
+        Masks the image based on color intensity.
 
-        # Extract left and right line pixel positions
-        leftx = nonzerox[left_lane_inds]
-        lefty = nonzeroy[left_lane_inds]
-        rightx = nonzerox[right_lane_inds]
-        righty = nonzeroy[right_lane_inds]
+        Parameters
+        ----------
+        image           : Image to mask.
+        threshold       : Color intensity threshold.
 
-        return leftx, lefty, rightx, righty, out_img
+        Returns
+        -------
+        Image mask with 1s in activations and 0 in other pixels.
+        """
+        mask = np.zeros_like(image)
+        mask[(image > threshold[0]) & (image <= threshold[1])] = 1
+        return mask
 
-    def fit_polynomial(self, binary_warped):
-        # Find our lane pixels first
-        leftx, lefty, rightx, righty, out_img = self.find_lane_pixels(binary_warped)
+    def get_edges(self, image, separate_channels=False):
+        """
+        Masks the image based on a composition of edge detectors: gradient value,
+        gradient magnitude, gradient direction and color.
 
-        # Fit a second order polynomial to each using `np.polyfit`
-        left_fit = np.polyfit(lefty, leftx, 2)
-        right_fit = np.polyfit(righty, rightx, 2)
+        Parameters
+        ----------
+        image               : Image to mask.
+        separate_channels   : Flag indicating if we need to put masks in different color channels.
 
-        # Generate x and y values for plotting
-        ploty = np.linspace(0, binary_warped.shape[0] - 1, binary_warped.shape[0])
-        try:
-            left_fitx = left_fit[0] * ploty ** 2 + left_fit[1] * ploty + left_fit[2]
-            right_fitx = right_fit[0] * ploty ** 2 + right_fit[1] * ploty + right_fit[2]
-        except TypeError:
-            # Avoids an error if `left` and `right_fit` are still none or incorrect
-            print('The function failed to fit a line!')
-            left_fitx = 1 * ploty ** 2 + 1 * ploty
-            right_fitx = 1 * ploty ** 2 + 1 * ploty
+        Returns
+        -------
+        Image mask with 1s in activations and 0 in other pixels.
+        """
+        # Convert to HLS color space and separate required channel
+        hls = cv2.cvtColor(np.copy(image), cv2.COLOR_RGB2HLS).astype(np.float)
+        s_channel = hls[:, :, 2]
+        # Get a combination of all gradient thresholding masks
+        gradient_x = self.gradient_abs_value_mask(s_channel, axis='x', sobel_kernel=3, threshold=(20, 100))
+        gradient_y = self.gradient_abs_value_mask(s_channel, axis='y', sobel_kernel=3, threshold=(20, 100))
+        magnitude = self.gradient_magnitude_mask(s_channel, sobel_kernel=3, threshold=(20, 100))
+        direction = self.gradient_direction_mask(s_channel, sobel_kernel=3, threshold=(0.7, 1.3))
+        gradient_mask = np.zeros_like(s_channel)
+        gradient_mask[((gradient_x == 1) & (gradient_y == 1)) | ((magnitude == 1) & (direction == 1))] = 1
+        # Get a color thresholding mask
+        color_mask = self.color_threshold_mask(s_channel, threshold=(170, 255))
 
-        ## Visualization ##
-        # Colors in the left and right lane regions
-        out_img[lefty, leftx] = [255, 255, 255]
-        out_img[righty, rightx] = [255, 255, 255]
+        if separate_channels:
+            return np.dstack((np.zeros_like(s_channel), gradient_mask, color_mask))
+        else:
+            mask = np.zeros_like(gradient_mask)
+            mask[(gradient_mask == 1) | (color_mask == 1)] = 1
+            return mask
 
-        # Plots the left and right polynomials on the lane lines
-        # plt.plot(left_fitx, ploty, color='yellow')
-        # plt.plot(right_fitx, ploty, color='yellow')
 
-        left_xs = left_fit[0] * (ploty ** 2) + left_fit[1] * ploty + left_fit[2]
-        right_xs = right_fit[0] * (ploty ** 2) + right_fit[1] * ploty + right_fit[2]
-        xls, xrs, ys = left_xs.astype(np.uint32), right_xs.astype(np.uint32), ploty.astype(np.uint32)
-
-        for xl, xr, y in zip(xls, xrs, ys):
-            cv2.line(out_img, (xl, y), (xl, y), (255, 203, 57), 4)
-            cv2.line(out_img, (xr, y), (xr, y), (255, 203, 57), 4)
-
-        return out_img
 
