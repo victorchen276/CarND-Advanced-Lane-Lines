@@ -51,6 +51,21 @@ class LaneDetect(object):
         (h, w, _) = debug_overlay.shape
         output_img[20:20 + h, 20:20 + w, :] = debug_overlay
 
+        text_x = 20 + 20 + w + w + 20
+
+        curvature = int(np.average([self.leftLane.radius_of_curvature(), self.rightLane.radius_of_curvature()]))
+        text = 'Radius of curvature:  {} m'.format(curvature)
+        cv2.putText(output_img, text, (text_x, 80), cv2.FONT_HERSHEY_SIMPLEX, .8, (255, 255, 255), 2)
+
+        center_dis = (3.7/2) - self.leftLane.camera_distance()
+        direction = 'left'
+        if center_dis < 0:
+            direction = 'right'
+        text = '{:.2f} m  {} of center'.format(center_dis, direction)
+
+        cv2.putText(output_img, text, (text_x, 110), cv2.FONT_HERSHEY_SIMPLEX, .8, (255, 255, 255), 2)
+
+
         output_img = self.draw_lane_overlay(output_img, unwarp_matrix)
         return output_img
 
@@ -117,6 +132,8 @@ class LaneDetect(object):
             window_x = window.mean_x
         return (nonzero[1][indices], nonzero[0][indices])
 
+
+
     def draw_debug_overlay(self, binary, lines=True, windows=True):
         """
         Draws an overlay with debugging information on a bird's-eye view of the road (e.g. after applying perspective
@@ -145,7 +162,7 @@ class LaneDetect(object):
             cv2.polylines(image, [self.leftLane.get_points()], False, (1., 0, 0), 2)
             cv2.polylines(image, [self.rightLane.get_points()], False, (1., 0, 0), 2)
         return image * 255
-        # return image
+
 
     def draw_lane_overlay(self, image, unwarp_matrix=None):
         """
@@ -164,6 +181,9 @@ class LaneDetect(object):
         points = np.vstack((self.leftLane.get_points(), np.flipud(self.rightLane.get_points())))
         # Draw the lane onto the warped blank image
         cv2.fillPoly(overlay, [points], (0, 255, 0))
+        cv2.polylines(overlay, np.int32([self.leftLane.get_points()]), isClosed=False, color=(255, 0, 0), thickness=25)
+        cv2.polylines(overlay, np.int32([self.rightLane.get_points()]), isClosed=False, color=(0, 0, 255), thickness=25)
+
         if unwarp_matrix is not None:
             # Warp the blank back to original image space using inverse perspective matrix (Minv)
             overlay = cv2.warpPerspective(overlay, unwarp_matrix, (image.shape[1], image.shape[0]))

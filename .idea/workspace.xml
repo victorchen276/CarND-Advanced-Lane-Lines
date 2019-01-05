@@ -2,7 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ee08878b-1b2b-4293-832b-3a4427a5e06f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_challenge_video.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_harder_challenge_video.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_project_video.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/output_project_video.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_videos/output_challenge_video.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_videos/output_harder_challenge_video.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_videos/output_project_video.mp4" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/source/LaneDetect.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/LaneDetect.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/Project.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/Project.py" afterDir="false" />
     </list>
@@ -39,12 +44,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="1407" />
+          <entry key="py" value="1629" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="1407" />
+          <entry key="Python" value="1629" />
         </counts>
       </usages-collector>
     </session>
@@ -67,10 +72,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/source/gradients.py">
+        <entry file="file://$PROJECT_DIR$/source/window.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1177">
-              <caret line="132" column="19" lean-forward="true" selection-start-line="3" selection-end-line="132" selection-end-column="19" />
+            <state relative-caret-position="357">
+              <caret line="21" column="20" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/source/LaneLine.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="667">
+              <caret line="99" column="31" selection-start-line="99" selection-start-column="7" selection-end-line="99" selection-end-column="31" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -79,46 +93,25 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/source/LaneDetect.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="69" column="21" selection-start-line="69" selection-start-column="21" selection-end-line="69" selection-end-column="21" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <marker date="1546683250007" expanded="true" signature="235:241" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/source/window.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="12" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/source/LaneLine.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="599">
-              <caret line="72" column="34" lean-forward="true" selection-start-line="72" selection-start-column="34" selection-end-line="72" selection-end-column="34" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/source/Project.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="837">
-              <caret line="103" column="18" lean-forward="true" selection-start-line="93" selection-start-column="25" selection-end-line="103" selection-end-column="18" />
+            <state relative-caret-position="589">
+              <caret line="110" column="49" selection-start-line="110" selection-start-column="49" selection-end-line="110" selection-end-column="49" />
               <folding>
                 <element signature="e#1#33#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/source/LaneDetect.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="598">
+              <caret line="65" column="49" selection-start-line="65" selection-start-column="49" selection-end-line="65" selection-end-column="49" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <marker date="1546685937072" expanded="true" signature="235:241" ph="..." />
               </folding>
             </state>
           </provider>
@@ -142,6 +135,8 @@
       <find>find_lane_pixels</find>
       <find>fit_polynomial</find>
       <find>get_edges</find>
+      <find>color_threshold_mask</find>
+      <find>radius_of_curvature</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -156,9 +151,9 @@
         <option value="$PROJECT_DIR$/source/LaneLine.py" />
         <option value="$PROJECT_DIR$/window.py" />
         <option value="$PROJECT_DIR$/source/camera.py" />
-        <option value="$PROJECT_DIR$/source/Project.py" />
         <option value="$PROJECT_DIR$/source/gradients.py" />
         <option value="$PROJECT_DIR$/source/LaneDetect.py" />
+        <option value="$PROJECT_DIR$/source/Project.py" />
       </list>
     </option>
   </component>
@@ -286,8 +281,8 @@
     <frame x="0" y="23" width="2560" height="1350" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.123510726" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49944136" visible="true" weight="0.123510726" />
+      <window_info id="Structure" order="1" sideWeight="0.5005587" side_tool="true" visible="true" weight="0.123510726" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -305,10 +300,10 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="SciView" order="3" sideWeight="0.49273744" visible="true" weight="0.19142176" />
+      <window_info active="true" anchor="right" id="SciView" order="3" sideWeight="0.74078214" visible="true" weight="0.3943606" />
       <window_info anchor="right" id="R Graphics" order="4" />
       <window_info anchor="right" id="R Packages" order="5" />
-      <window_info anchor="right" x="0" y="0" width="590" height="1150" id="Documentation" order="6" sideWeight="0.5072626" side_tool="true" visible="true" weight="0.19142176" />
+      <window_info anchor="right" x="0" y="0" width="590" height="1150" id="Documentation" order="6" sideWeight="0.2592179" side_tool="true" visible="true" weight="0.3943606" />
       <window_info anchor="right" id="Database" order="7" />
     </layout>
   </component>
@@ -360,26 +355,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/source/Project.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="837">
-          <caret line="103" column="18" lean-forward="true" selection-start-line="93" selection-start-column="25" selection-end-line="103" selection-end-column="18" />
-          <folding>
-            <element signature="e#1#33#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/source/LaneLine.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="599">
-          <caret line="72" column="34" lean-forward="true" selection-start-line="72" selection-start-column="34" selection-end-line="72" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/source/camera.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="340">
@@ -393,13 +368,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/source/window.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="12" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/source/gradients.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1177">
@@ -410,13 +378,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/source/LaneDetect.py">
+    <entry file="file://$PROJECT_DIR$/source/window.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="69" column="21" selection-start-line="69" selection-start-column="21" selection-end-line="69" selection-end-column="21" />
+        <state relative-caret-position="357">
+          <caret line="21" column="20" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/source/LaneLine.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="667">
+          <caret line="99" column="31" selection-start-line="99" selection-start-column="7" selection-end-line="99" selection-end-column="31" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1546683250007" expanded="true" signature="235:241" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/source/LaneDetect.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="598">
+          <caret line="65" column="49" selection-start-line="65" selection-start-column="49" selection-end-line="65" selection-end-column="49" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1546685937072" expanded="true" signature="235:241" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/source/Project.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="589">
+          <caret line="110" column="49" selection-start-line="110" selection-start-column="49" selection-end-line="110" selection-end-column="49" />
+          <folding>
+            <element signature="e#1#33#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -1,7 +1,7 @@
 
 from source.camera import camera
 from source.LaneDetect import LaneDetect
-from source.gradients import get_edges
+# from source.gradients import get_edges
 
 from moviepy.editor import VideoFileClip
 import glob
@@ -91,23 +91,24 @@ if __name__ == "__main__":
     # ax2.imshow(result)
     # plt.show()
 
-    for image_name in glob.glob('../test_images/*.jpg'):
-        orig_img = mpimg.imread(image_name)
-        undistort = camera_calibrate.undistort(orig_img)
+    # for image_name in glob.glob('../test_images/*.jpg'):
+    #     orig_img = mpimg.imread(image_name)
+    #     undistort = camera_calibrate.undistort(orig_img)
+    #
+    #     lane_detecter = LaneDetect(undistort)
+    #     output_img = lane_detecter.process_pipeline(undistort)
+    #     f, (ax1) = plt.subplots(1, 1, figsize=(9, 6))
+    #     ax1.imshow(output_img)
+    #     ax1.set_title('output_img', fontsize=20)
+    #     plt.axis('off')
+    #     plt.show()
+    #     # break
 
-        lane_detecter = LaneDetect(undistort)
-        output_img = lane_detecter.process_pipeline(undistort)
-        f, (ax1) = plt.subplots(1, 1, figsize=(9, 6))
-        ax1.imshow(output_img)
-        ax1.set_title('output_img', fontsize=20)
-        plt.axis('off')
-        plt.show()
 
-
-    # clip1 = VideoFileClip('../project_video.mp4')
-    # lane_detecter = LaneDetect(clip1.get_frame(0))
-    # outputclip = clip1.fl_image(lane_detecter.process_pipeline)
-    # outputclip.write_videofile('../output_project_video.mp4', audio=False);
+    clip1 = VideoFileClip('../project_video.mp4')
+    lane_detecter = LaneDetect(clip1.get_frame(0))
+    outputclip = clip1.fl_image(lane_detecter.process_pipeline)
+    outputclip.write_videofile('../output_videos/output_project_video.mp4', audio=False);
     #
     # clip1 = VideoFileClip('../harder_challenge_video.mp4');
     # lane_detecter = LaneDetect(clip1.get_frame(0))
