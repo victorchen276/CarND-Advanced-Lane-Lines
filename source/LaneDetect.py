@@ -19,11 +19,10 @@ class LaneDetect(object):
         self.l_windows = []
         self.r_windows = []
 
-        self.camera_calibrate = camera()
-        self.camera_calibrate.load_calibration_data('./camera_calibration_data.p')
-
-        (self.h, self.w, _) = first_frame.shape
-        self.initialize_lines(first_frame)
+        # self.camera_calibrate = camera()
+        # self.camera_calibrate.load_calibration_data('./camera_calibration_data.p')
+        # (self.h, self.w, _) = first_frame.shape
+        # self.initialize_lines(first_frame)
 
     def process_pipeline(self, img):
 
@@ -134,33 +133,20 @@ class LaneDetect(object):
 
 
 
-    def draw_debug_overlay(self, binary, lines=True, windows=True):
-        """
-        Draws an overlay with debugging information on a bird's-eye view of the road (e.g. after applying perspective
-        transform).
-        Parameters
-        ----------
-        binary  : Frame to overlay.
-        lines   : Flag indicating if we need to draw lines.
-        windows : Flag indicating if we need to draw windows.
-        Returns
-        -------
-        Frame with an debug information overlay.
-        """
-        if len(binary.shape) == 2:
-            image = np.dstack((binary, binary, binary))
-        else:
-            image = binary
-        if windows:
-            for window in self.l_windows:
-                coordinates = window.coordinates()
-                cv2.rectangle(image, coordinates[0], coordinates[1], (1., 1., 0), 2)
-            for window in self.r_windows:
-                coordinates = window.coordinates()
-                cv2.rectangle(image, coordinates[0], coordinates[1], (1., 1., 0), 2)
-        if lines:
-            cv2.polylines(image, [self.leftLane.get_points()], False, (1., 0, 0), 2)
-            cv2.polylines(image, [self.rightLane.get_points()], False, (1., 0, 0), 2)
+    def draw_debug_overlay(self, binary_img):
+
+        image = np.dstack((binary_img, binary_img, binary_img))
+
+
+        for window in self.l_windows:
+            coordinates = window.coordinates()
+            cv2.rectangle(image, coordinates[0], coordinates[1], (1., 1., 0), 2)
+        for window in self.r_windows:
+            coordinates = window.coordinates()
+            cv2.rectangle(image, coordinates[0], coordinates[1], (1., 1., 0), 2)
+
+        cv2.polylines(image, [self.leftLane.get_points()], False, (1., 0, 0), 2)
+        cv2.polylines(image, [self.rightLane.get_points()], False, (1., 0, 0), 2)
         return image * 255
 
 
