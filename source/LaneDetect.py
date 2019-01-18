@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 
 from source.camera import camera
-# from source.gradients import get_edges
 from source.LaneLine import LaneLine
 from source.window import Window
 
@@ -19,10 +18,62 @@ class LaneDetect(object):
         self.l_windows = []
         self.r_windows = []
 
-        # self.camera_calibrate = camera()
-        # self.camera_calibrate.load_calibration_data('./camera_calibration_data.p')
-        # (self.h, self.w, _) = first_frame.shape
-        # self.initialize_lines(first_frame)
+        (self.h, self.w, _) = first_frame.shape
+        self.camera = camera()
+
+        self.load_camera()
+        self.init_lines(first_frame)
+
+    def load_camera(self, load_data=True, calibration_data='./camera_calibration_data.p', images=''):
+        if load_data is True:
+            self.camera.load_calibration_data(calibration_data)
+        else:
+            self.camera.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data_1.p')
+
+    def init_lines(self, frame):
+        """
+        Finds starting points for left and right lines (e.g. lane edges) and initialises Window and Line objects.
+        Parameters
+        ----------
+        frame   : Frame to scan for lane edges.
+        """
+        # Take a histogram of the bottom half of the image
+        # edges = get_edges(frame)
+        # (flat_edges, _) = flatten_perspective(edges)
+
+        # undist = self.camera_calibrate.undistort(frame)
+
+        edges = self.get_edges(frame)
+        flat_edges, unwarp_matrix = self.camera.birds_eye(edges)
+        # birdeye_img, unwarp_matrix = self.camera_calibrate.birds_eye(frame)
+        # flat_edges = get_edges(birdeye_img)
+        histogram = np.sum(flat_edges[int(self.h / 2):, :], axis=0)
+
+        nonzero = flat_edges.nonzero()
+        # Create empty lists to receive left and right lane pixel indices
+        l_indices = np.empty([0], dtype=np.int)
+        r_indices = np.empty([0], dtype=np.int)
+        window_height = int(self.h / self.num_windows)
+
+        for i in range(self.num_windows):
+            l_window = Window(
+                y1=self.h - (i + 1) * window_height,
+                y2=self.h - i * window_height,
+                x=self.l_windows[-1].x if len(self.l_windows) > 0 else np.argmax(histogram[:self.w // 2])
+            )
+            r_window = Window(
+                y1=self.h - (i + 1) * window_height,
+                y2=self.h - i * window_height,
+                x=self.r_windows[-1].x if len(self.r_windows) > 0 else np.argmax(histogram[self.w // 2:]) + self.w // 2
+            )
+            # Append nonzero indices in the window boundary to the lists
+            l_indices = np.append(l_indices, l_window.pixels_in(nonzero), axis=0)
+            r_indices = np.append(r_indices, r_window.pixels_in(nonzero), axis=0)
+            self.l_windows.append(l_window)
+            self.r_windows.append(r_window)
+        self.leftLane = LaneLine(x=nonzero[1][l_indices], y=nonzero[0][l_indices], h=self.h, w=self.w)
+        self.rightLane = LaneLine(x=nonzero[1][r_indices], y=nonzero[0][r_indices], h=self.h, w=self.w)
+
 
     def process_pipeline(self, img):
 
@@ -68,49 +119,6 @@ class LaneDetect(object):
         output_img = self.draw_lane_overlay(output_img, unwarp_matrix)
         return output_img
 
-    def initialize_lines(self, frame):
-        """
-        Finds starting points for left and right lines (e.g. lane edges) and initialises Window and Line objects.
-        Parameters
-        ----------
-        frame   : Frame to scan for lane edges.
-        """
-        # Take a histogram of the bottom half of the image
-        # edges = get_edges(frame)
-        # (flat_edges, _) = flatten_perspective(edges)
-
-        # undist = self.camera_calibrate.undistort(frame)
-
-        edges = self.get_edges(frame)
-        flat_edges, unwarp_matrix = self.camera_calibrate.birds_eye(edges)
-        # birdeye_img, unwarp_matrix = self.camera_calibrate.birds_eye(frame)
-        # flat_edges = get_edges(birdeye_img)
-        histogram = np.sum(flat_edges[int(self.h / 2):, :], axis=0)
-
-        nonzero = flat_edges.nonzero()
-        # Create empty lists to receive left and right lane pixel indices
-        l_indices = np.empty([0], dtype=np.int)
-        r_indices = np.empty([0], dtype=np.int)
-        window_height = int(self.h / self.num_windows)
-
-        for i in range(self.num_windows):
-            l_window = Window(
-                y1=self.h - (i + 1) * window_height,
-                y2=self.h - i * window_height,
-                x=self.l_windows[-1].x if len(self.l_windows) > 0 else np.argmax(histogram[:self.w // 2])
-            )
-            r_window = Window(
-                y1=self.h - (i + 1) * window_height,
-                y2=self.h - i * window_height,
-                x=self.r_windows[-1].x if len(self.r_windows) > 0 else np.argmax(histogram[self.w // 2:]) + self.w // 2
-            )
-            # Append nonzero indices in the window boundary to the lists
-            l_indices = np.append(l_indices, l_window.pixels_in(nonzero), axis=0)
-            r_indices = np.append(r_indices, r_window.pixels_in(nonzero), axis=0)
-            self.l_windows.append(l_window)
-            self.r_windows.append(r_window)
-        self.leftLane = LaneLine(x=nonzero[1][l_indices], y=nonzero[0][l_indices], h=self.h, w=self.w)
-        self.rightLane = LaneLine(x=nonzero[1][r_indices], y=nonzero[0][r_indices], h=self.h, w=self.w)
 
     def scan_frame_with_windows(self, img, windows):
         """
@@ -273,20 +281,8 @@ class LaneDetect(object):
         mask[(image > threshold[0]) & (image <= threshold[1])] = 1
         return mask
 
-    def get_edges(self, image, separate_channels=False):
-        """
-        Masks the image based on a composition of edge detectors: gradient value,
-        gradient magnitude, gradient direction and color.
+    def get_edges(self, image):
 
-        Parameters
-        ----------
-        image               : Image to mask.
-        separate_channels   : Flag indicating if we need to put masks in different color channels.
-
-        Returns
-        -------
-        Image mask with 1s in activations and 0 in other pixels.
-        """
         # Convert to HLS color space and separate required channel
         hls = cv2.cvtColor(np.copy(image), cv2.COLOR_RGB2HLS).astype(np.float)
         s_channel = hls[:, :, 2]
@@ -300,12 +296,16 @@ class LaneDetect(object):
         # Get a color thresholding mask
         color_mask = self.color_threshold_mask(s_channel, threshold=(170, 255))
 
-        if separate_channels:
-            return np.dstack((np.zeros_like(s_channel), gradient_mask, color_mask))
-        else:
-            mask = np.zeros_like(gradient_mask)
-            mask[(gradient_mask == 1) | (color_mask == 1)] = 1
-            return mask
+        # if separate_channels:
+        #     return np.dstack((np.zeros_like(s_channel), gradient_mask, color_mask))
+        # else:
+        #     mask = np.zeros_like(gradient_mask)
+        #     mask[(gradient_mask == 1) | (color_mask == 1)] = 1
+        #     return mask
+
+        mask = np.zeros_like(gradient_mask)
+        mask[(gradient_mask == 1) | (color_mask == 1)] = 1
+        return mask
 
 
 

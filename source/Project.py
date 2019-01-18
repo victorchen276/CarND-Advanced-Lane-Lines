@@ -23,11 +23,12 @@ def rgb2gray(rgb):
 if __name__ == "__main__":
     print('main')
 
-    images = glob.glob('../camera_cal/calibration*.jpg')
+    # images = glob.glob('../camera_cal/calibration*.jpg')
     # print(images)
 
-    # camera_calibrate = camera()
-    # camera_calibrate.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data_1.p')
+    # camera = camera()
+    # camera.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data_1.p')
+
 
     # # images = sorted(images, key=lambda x: float(re.findall("(\d+)", x)[0]))
     #
@@ -83,7 +84,7 @@ if __name__ == "__main__":
 
     image = mpimg.imread('../test_images/test6.jpg')
     lane_detecter = LaneDetect(image)
-    result = lane_detecter.get_edges(image, separate_channels=True)
+    result = lane_detecter.get_edges(image)
 
     # Plot the result
     f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
@@ -96,8 +97,8 @@ if __name__ == "__main__":
 
 
     ax2.imshow(result, cmap='gray')
-    plt.show()
-    # plt.savefig('edge.png')
+    # plt.show()
+    plt.savefig('edge.png')
 
     # for image_name in glob.glob('../test_images/*.jpg'):
     #     orig_img = mpimg.imread(image_name)

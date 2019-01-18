@@ -27,20 +27,19 @@ The goals / steps of this project are the following:
 
 
 
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
+![alt Text](output.gif)
 
 
 ---
 
 ### Camera Calibration
 
-#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+I use the OpenCV functions findChessboardCorners and drawChessboardCorners to 
+get the coordinates of corners on a series of image of a chessboard taken from different angles.
+When the code collect all these coordinates, I use `cv2.undistort()` function to compute 
+the camera calibration matrix and distortion coefficients.
 
-The code for this step is contained in the first code cell of the IPython notebook located in "./examples/example.ipynb" (or in lines # through # of the file called `some_file.py`).  
-
-I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
-
-I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result: 
+Result: 
 
 ![alt text][image1]
 
@@ -62,6 +61,11 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
+
+# # Define source points
+        src = np.float32([[w // 2 - 76, h * .625], [w // 2 + 76, h * .625], [-100, h], [w + 100, h]])
+        # Define corresponding destination points
+        dst = np.float32([[100, 0], [w - 100, 0], [100, h], [w - 100, h]])
 ```python
 src = np.float32(
     [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
@@ -76,6 +80,16 @@ dst = np.float32(
 ```
 
 This resulted in the following source and destination points:
+src
+[[ 564.  450.]
+ [ 716.  450.]
+ [-100.  720.]
+ [1380.  720.]]
+ dst
+[[ 100.    0.]
+ [1180.    0.]
+ [ 100.  720.]
+ [1180.  720.]]
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 

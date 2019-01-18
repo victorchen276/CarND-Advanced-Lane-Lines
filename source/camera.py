@@ -47,8 +47,11 @@ class camera(object):
 
         # # Define source points
         src = np.float32([[w // 2 - 76, h * .625], [w // 2 + 76, h * .625], [-100, h], [w + 100, h]])
+        print(src)
         # Define corresponding destination points
         dst = np.float32([[100, 0], [w - 100, 0], [100, h], [w - 100, h]])
+        print(dst)
+        print('============================================')
 
         transform_matrix = cv2.getPerspectiveTransform(src, dst)
         warped = cv2.warpPerspective(img, transform_matrix, (w, h))
