@@ -30,7 +30,7 @@ class camera(object):
 
     # Perform perspective transform
     def birds_eye(self, img):
-        # undist = self.undistort(img)
+        undist = self.undistort(img)
         # img_size = (undist.shape[1], undist.shape[0])
         # src = np.float32([(580, 460),  # top left
         #                   (200, 720),  # bottom left
@@ -43,18 +43,17 @@ class camera(object):
         #                   (960, 0)])
 
         # Get image dimensions
-        (h, w) = (img.shape[0], img.shape[1])
+        (h, w) = (undist.shape[0], undist.shape[1])
 
         # # Define source points
         src = np.float32([[w // 2 - 76, h * .625], [w // 2 + 76, h * .625], [-100, h], [w + 100, h]])
-        print(src)
+        # print(src)
         # Define corresponding destination points
         dst = np.float32([[100, 0], [w - 100, 0], [100, h], [w - 100, h]])
-        print(dst)
-        print('============================================')
+        # print(dst)
 
         transform_matrix = cv2.getPerspectiveTransform(src, dst)
-        warped = cv2.warpPerspective(img, transform_matrix, (w, h))
+        warped = cv2.warpPerspective(undist, transform_matrix, (w, h))
         unwarp_matrix = cv2.getPerspectiveTransform(dst, src)
         return warped, unwarp_matrix
 
@@ -122,4 +121,6 @@ class camera(object):
             "camera_matrix": camera_matrix,
             "distortion_coefficient": distortion_coef
         }
+        self.camera_matrix = calibration_data['camera_matrix']
+        self.dist_coef = calibration_data['distortion_coefficient']
         pickle.dump(calibration_data, open(outputfilename, "wb"))

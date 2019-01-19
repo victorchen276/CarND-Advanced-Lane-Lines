@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 class LaneDetect(object):
 
-    def __init__(self, first_frame):
+    def __init__(self):
         self.num_windows = 9
         self.leftLane = None
         self.rightLane = None
@@ -18,19 +18,22 @@ class LaneDetect(object):
         self.l_windows = []
         self.r_windows = []
 
-        (self.h, self.w, _) = first_frame.shape
+        # (self.h, self.w, _) = first_frame.shape
+        self.h = 0
+        self.w = 0
+        self.camera = None
+
+        # self.load_camera()
+        # self.init_lines(first_frame)
+
+    def initcamera(self, load_data=True, calibration_data='./camera_calibration_data.p', images=''):
         self.camera = camera()
-
-        self.load_camera()
-        self.init_lines(first_frame)
-
-    def load_camera(self, load_data=True, calibration_data='./camera_calibration_data.p', images=''):
         if load_data is True:
             self.camera.load_calibration_data(calibration_data)
         else:
-            self.camera.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data_1.p')
+            self.camera.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data.p')
 
-    def init_lines(self, frame):
+    def initlines(self, frame):
         """
         Finds starting points for left and right lines (e.g. lane edges) and initialises Window and Line objects.
         Parameters
@@ -41,7 +44,10 @@ class LaneDetect(object):
         # edges = get_edges(frame)
         # (flat_edges, _) = flatten_perspective(edges)
 
+
         # undist = self.camera_calibrate.undistort(frame)
+
+        (self.h, self.w, _) = frame.shape
 
         edges = self.get_edges(frame)
         flat_edges, unwarp_matrix = self.camera.birds_eye(edges)
@@ -83,7 +89,7 @@ class LaneDetect(object):
         # warped_edges_img = get_edges(birdeye_img)
 
         edges = self.get_edges(img)
-        flat_edges, unwarp_matrix = self.camera_calibrate.birds_eye(edges)
+        flat_edges, unwarp_matrix = self.camera.birds_eye(edges)
 
         (l_x, l_y) = self.scan_frame_with_windows(flat_edges, self.l_windows)
         self.leftLane.process_points(l_x, l_y)
@@ -96,7 +102,7 @@ class LaneDetect(object):
         # plt.axis('off')
         # plt.show()
 
-        debug_overlay = self.draw_debug_overlay(flat_edges, lines=True, windows=True)
+        debug_overlay = self.draw_debug_overlay(flat_edges)
         debug_overlay = cv2.resize(debug_overlay, (0, 0), fx=0.3, fy=0.3)
         (h, w, _) = debug_overlay.shape
         output_img[20:20 + h, 20:20 + w, :] = debug_overlay
