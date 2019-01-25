@@ -26,9 +26,9 @@ The goals / steps of this project are the following:
 [result_image1]: ./output_images/result_1.png "Result1"
 
 
-
+<!---
 ![alt Text](output.gif)
-
+-->
 
 ---
 
@@ -36,8 +36,11 @@ The goals / steps of this project are the following:
 
 I use the OpenCV functions findChessboardCorners and drawChessboardCorners to 
 get the coordinates of corners on a series of image of a chessboard taken from different angles.
-When the code collect all these coordinates, I use `cv2.undistort()` function to compute 
-the camera calibration matrix and distortion coefficients.
+Once I have all the coordinates from each image, I am able to compute the camera 
+calibration matrix and distortion coefficients using the cv2.calibrateCamera() function.
+
+At this stage, I can use `cv2.undistort()` function to correct images with same calibration matrix and distortion coefficients
+
 
 Result: 
 
@@ -53,7 +56,42 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  
+
+
+### Gradient absolute value
+For absolute gradient value we simply apply a threshold to `cv2.Sobel()` output for each axis.
+
+```python
+sobel = np.absolute(cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3))
+```
+
+### Gradient magnitude
+Additionaly we include pixels within a threshold of the gradient magnitude.
+
+```python
+sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
+sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
+magnitude = np.sqrt(sobel_x ** 2 + sobel_y ** 2)
+```
+
+### Gradient direction
+We also include pixels that happen to be withing a threshold of the gradient direction.
+
+```python
+sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=3)
+sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=3)
+direction = np.arctan2(np.absolute(sobel_y), np.absolute(sobel_x))
+```
+
+### Color
+Finally, we extract S channel of image representation in the HLS color space and then apply a threshold on its absolute value.
+
+```python
+hls = cv2.cvtColor(np.copy(image), cv2.COLOR_RGB2HLS).astype(np.float)
+s_channel = hls[:, :, 2]
+```
+Here's an example of my output for this step.  
 
 ![alt text][image3]
 
