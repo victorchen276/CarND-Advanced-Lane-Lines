@@ -21,7 +21,7 @@ The goals / steps of this project are the following:
 [image4]: ./output_images/warp_1.png "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
 [image6]: ./examples/example_output.jpg "Output"
-[video1]: ./output_videos/output_project_video.mp4 "Video"
+[video1]: https://github.com/victorchen276/CarND-Advanced-Lane-Lines/blob/master/output_videos/output_project_video.mp4 "Video"
 
 [result_image1]: ./output_images/result_1.png "Result1"
 [curve_grad]:./output_images/curve_grad.png "curve_grad"
@@ -32,15 +32,15 @@ The goals / steps of this project are the following:
 
 ### Camera Calibration
 
-I use the OpenCV functions findChessboardCorners and drawChessboardCorners to 
+I use the OpenCV functions findChessboardCorners and drawChessboardCorners to
 get the coordinates of corners on a series of image of a chessboard taken from different angles.
-Once I have all the coordinates from each image, I am able to compute the camera 
+Once I have all the coordinates from each image, I am able to compute the camera
 calibration matrix and distortion coefficients using the cv2.calibrateCamera() function.
 
 At this stage, I can use `cv2.undistort()` function to correct images with same calibration matrix and distortion coefficients
 
 
-Result: 
+Result:
 
 ![alt text][image1]
 
@@ -54,7 +54,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  
+I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).
 
 
 ### Gradient absolute value
@@ -89,7 +89,7 @@ Finally, we extract S channel of image representation in the HLS color space and
 hls = cv2.cvtColor(np.copy(image), cv2.COLOR_RGB2HLS).astype(np.float)
 s_channel = hls[:, :, 2]
 ```
-Here's an example of my output for this step.  
+Here's an example of my output for this step.
 
 ![alt text][image3]
 
@@ -117,7 +117,7 @@ src
  [1180.    0.]
  [ 100.  720.]
  [1180.  720.]]
- 
+
 The transformation is applied using cv2.getPerspectiveTransform() function. I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
 ![alt text][image4]
@@ -127,12 +127,12 @@ It is implemented in birds_eye method in carmrea.py
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-the code searches the  frame from bottom to top trying to find the pixels that could be representing 
-lane line boundaries. The code is trying to identify two lines  
-that can be lane boundaries. For each of those lines, we have a set of 
-windows. We scan the frame with those windows, 
-collecting non-zero pixels within window bounds. Once we reach the top, 
-we try to fit a second order polynomial into collected points. 
+the code searches the  frame from bottom to top trying to find the pixels that could be representing
+lane line boundaries. The code is trying to identify two lines
+that can be lane boundaries. For each of those lines, we have a set of
+windows. We scan the frame with those windows,
+collecting non-zero pixels within window bounds. Once we reach the top,
+we try to fit a second order polynomial into collected points.
 This polynomial coefficients would represent a single lane boundary.
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
@@ -178,4 +178,3 @@ Here's a [link to my video result][video1]
 It will fail in many situation, for example changing weather conditions, lack or damage of lane marking.
 We can extract lof of useful information by examing the gradients and color space of pixel values. These
 data can be used as input of more sophisticated algorithms.
-
