@@ -34,12 +34,6 @@ class LaneDetect(object):
             self.camera.calibration(images, x_cor=9, y_cor=6, outputfilename='./camera_calibration_data.p')
 
     def initlines(self, frame):
-        """
-        Finds starting points for left and right lines (e.g. lane edges) and initialises Window and Line objects.
-        Parameters
-        ----------
-        frame   : Frame to scan for lane edges.
-        """
         # Take a histogram of the bottom half of the image
         # edges = get_edges(frame)
         # (flat_edges, _) = flatten_perspective(edges)
@@ -127,16 +121,6 @@ class LaneDetect(object):
 
 
     def scan_frame_with_windows(self, img, windows):
-        """
-        Scans a frame using initialised windows in an attempt to track the lane edges.
-        Parameters
-        ----------
-        img   : New frame
-        windows : Array of windows to use for scanning the frame.
-        Returns
-        -------
-        A tuple of arrays containing coordinates of points found in the specified windows.
-        """
         indices = np.empty([0], dtype=np.int)
         nonzero = img.nonzero()
         window_x = None
@@ -165,17 +149,6 @@ class LaneDetect(object):
 
 
     def draw_lane_overlay(self, image, unwarp_matrix=None):
-        """
-        Draws an overlay with tracked lane applying perspective unwarp to project it on the original frame.
-        Parameters
-        ----------
-        image           : Original frame.
-        unwarp_matrix   : Transformation matrix to unwarp the bird's eye view to initial frame. Defaults to `None` (in
-        which case no unwarping is applied).
-        Returns
-        -------
-        Frame with a lane overlay.
-        """
         # Create an image to draw the lines on
         overlay = np.zeros_like(image).astype(np.uint8)
         points = np.vstack((self.leftLane.get_points(), np.flipud(self.rightLane.get_points())))
@@ -191,20 +164,6 @@ class LaneDetect(object):
         return cv2.addWeighted(image, 1, overlay, 0.3, 0)
 
     def gradient_abs_value_mask(self, image, sobel_kernel=3, axis='x', threshold=(0, 255)):
-        """
-        Masks the image based on gradient absolute value.
-
-        Parameters
-        ----------
-        image           : Image to mask.
-        sobel_kernel    : Kernel of the Sobel gradient operation.
-        axis            : Axis of the gradient, 'x' or 'y'.
-        threshold       : Value threshold for it to make it to appear in the mask.
-
-        Returns
-        -------
-        Image mask with 1s in activations and 0 in other pixels.
-        """
         # Take the absolute value of derivative in x or y given orient = 'x' or 'y'
         if axis == 'x':
             sobel = np.absolute(cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=sobel_kernel))
@@ -219,19 +178,6 @@ class LaneDetect(object):
         return mask
 
     def gradient_magnitude_mask(self, image, sobel_kernel=3, threshold=(0, 255)):
-        """
-        Masks the image based on gradient magnitude.
-
-        Parameters
-        ----------
-        image           : Image to mask.
-        sobel_kernel    : Kernel of the Sobel gradient operation.
-        threshold       : Magnitude threshold for it to make it to appear in the mask.
-
-        Returns
-        -------
-        Image mask with 1s in activations and 0 in other pixels.
-        """
         # Take the gradient in x and y separately
         sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
         sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
@@ -246,19 +192,6 @@ class LaneDetect(object):
         return mask
 
     def gradient_direction_mask(self, image, sobel_kernel=3, threshold=(0, np.pi / 2)):
-        """
-        Masks the image based on gradient direction.
-
-        Parameters
-        ----------
-        image           : Image to mask.
-        sobel_kernel    : Kernel of the Sobel gradient operation.
-        threshold       : Direction threshold for it to make it to appear in the mask.
-
-        Returns
-        -------
-        Image mask with 1s in activations and 0 in other pixels.
-        """
         # Take the gradient in x and y separately
         sobel_x = cv2.Sobel(image, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
         sobel_y = cv2.Sobel(image, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
@@ -271,18 +204,6 @@ class LaneDetect(object):
         return mask
 
     def color_threshold_mask(self, image, threshold=(0, 255)):
-        """
-        Masks the image based on color intensity.
-
-        Parameters
-        ----------
-        image           : Image to mask.
-        threshold       : Color intensity threshold.
-
-        Returns
-        -------
-        Image mask with 1s in activations and 0 in other pixels.
-        """
         mask = np.zeros_like(image)
         mask[(image > threshold[0]) & (image <= threshold[1])] = 1
         return mask
@@ -301,13 +222,6 @@ class LaneDetect(object):
         gradient_mask[((gradient_x == 1) & (gradient_y == 1)) | ((magnitude == 1) & (direction == 1))] = 1
         # Get a color thresholding mask
         color_mask = self.color_threshold_mask(s_channel, threshold=(170, 255))
-
-        # if separate_channels:
-        #     return np.dstack((np.zeros_like(s_channel), gradient_mask, color_mask))
-        # else:
-        #     mask = np.zeros_like(gradient_mask)
-        #     mask[(gradient_mask == 1) | (color_mask == 1)] = 1
-        #     return mask
 
         mask = np.zeros_like(gradient_mask)
         mask[(gradient_mask == 1) | (color_mask == 1)] = 1
