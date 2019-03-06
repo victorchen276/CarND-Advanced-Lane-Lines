@@ -27,9 +27,6 @@ The goals / steps of this project are the following:
 [curve_grad]:./output_images/curve_grad.png "curve_grad"
 
 
-<!---
-![alt Text](output.gif)
--->
 
 ---
 
@@ -168,13 +165,15 @@ I implemented this step in lines # through # in my code in `LaneDetect.py` in th
 
 Here's a [link to my video result][video1]
 
+<p align="center">
+  <img src="output.gif" alt="Sample of the project video."/>
+</p>
+
 ---
 
 ### Discussion
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
 
 It will fail in many situation, for example changing weather conditions, lack or damage of lane marking.
 We can extract lof of useful information by examing the gradients and color space of pixel values. These
